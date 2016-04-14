@@ -1,0 +1,30 @@
+{
+  "name": "angular-study",
+  "homepage": "https://github.com/wangjian2672/angular-study",
+  "authors": [
+    "wangjian2672 <wangjian2672@163.com>"
+  ],
+  "description": "a study series",
+  "main": "./angular.js",
+  "keywords": [
+    "study"
+  ],
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+   "dependencies": {
+    "angular": "~1.5.3",
+    "angular-route": "~1.5.3",
+    "angular-loader": "~1.5.3",
+    "angular-mocks": "~1.5.3",
+    "html5-boilerplate": "~5.3.0",
+	"bootstrap": "~3.3.6"
+  }
+}
