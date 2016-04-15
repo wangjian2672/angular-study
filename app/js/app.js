@@ -1,12 +1,27 @@
-'use strict';
+﻿'use strict';
 
-// Declare app level module which depends on views, and components
-angular.module('lraBackend', [
+var lraBackendApp = angular.module('lraBackend', [
 	'ngRoute',
-	'lraBackend.ticket.list',
-	'lraBackend.ticket.detail',
-	'lraBackend.application.list',
-	'lraBackend.application.detail'
-]).config(['$routeProvider', function($routeProvider) {
-	$routeProvider.otherwise({redirectTo: '/view1'});
+	'ngMaterial',
+	'lraBackendResource',
+	'lraBackendCtrl'
+]);
+
+lraBackendApp.config(['$routeProvider', '$mdThemingProvider', function($routeProvider, $mdThemingProvider) { 
+	$mdThemingProvider.theme('default')
+		.primaryPalette('grey')
+		.accentPalette('blue-grey');
+
+	$routeProvider.
+		when('/ticket', {
+			templateUrl: 'views/ticket/ticket-list.html',
+			controller: 'TicketListCtrl'
+		}).
+		when('/ticket/:ticketId', {
+			templateUrl: 'views/ticket/ticket-detail.html',
+			controller: 'TicketDetailCtrl'
+		}).
+		otherwise({
+			redirectTo: '/ticket'
+		});
 }]);

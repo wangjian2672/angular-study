@@ -25,6 +25,7 @@
     "angular-loader": "~1.5.3",
     "angular-mocks": "~1.5.3",
     "html5-boilerplate": "~5.3.0",
-	"bootstrap": "~3.3.6"
+	"bootstrap": "~3.3.6",
+	"angular-material": "~1.0.7"
   }
 }
