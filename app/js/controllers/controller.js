@@ -1,32 +1,12 @@
-﻿var lraBackendAppCtrl = angular.module('lraBackendCtrl', [
-	'ngMaterial'
-]);
+﻿'use strict';
 
-lraBackendAppCtrl.controller('lraBackendCtrl.mainCtrl', ['$scope', '$mdSidenav', '$http' function($scope, $mdSidenav, $http){
-	
-	$http.get("http://www.runoob.com/try/angularjs/data/Customers_JSON.php")
-		.success(function(response) {
-			$scope.names = response.records;
-		});
-	
-	
-	$scope.menus = [
-		{
-			"id": "menuOrder",
-			"name": "注文"
-		}, 
-		{
-			"id": "menuTicket",
-			"name": "チケット"
-		}, 
-		{
-			"id": "menuRemainings",
-			"name": "残数"
-		}
-	];
-	$scope.navId = "sideMenu";
-	
-	$scope.toggleMenu = function(navId) {
-        $mdSidenav(navId).toggle();
-	};
+angular.module('lraBackendCtrl', [
+	'ngMaterial',
+	'lraBackendMenuService'
+])
+.controller('lraBackendCtrl.mainCtrl', ['$scope', '$mdSidenav', '$http', 'Menu', function($scope, $mdSidenav, $http, Menu){
+	$scope.menus = Menu.getAll();
+	$scope.menuSvg = Menu.constants.ICON_URL;
+	$scope.navId =  Menu.constants.NAV_ID;
+	$scope.toggleMenu = Menu.methods.toggleMenu;
 }]);

@@ -15,7 +15,7 @@
 					<div flex>
 						<md-menu>
 							<md-button class="md-fab md-accent" ng-click="toggleMenu('{{navId}}')" aria-label="メニュー">
-								<md-icon md-svg-src="img/icons/menu.svg"></md-icon>
+								<md-icon md-svg="{{menuSvg}}"></md-icon>
 							</md-button>
 						</md-menu>
 					</div>
@@ -43,8 +43,15 @@
 		<script src="bower_components/angular-route/angular-route.js"></script>
 		<script src="bower_components/angular-material/angular-material.js"></script>
 		<script src="js/app.js"></script>
-		<script src="views/tickets/detail/detail.js"></script>
-		<script src="views/tickets/list/list.js"></script>
-		<script src="views/tickets/remainings/remainings.js"></script>
+		<script src="js/controllers/controller.js"></script>
+		<script src="js/services/cookieutil.js"></script>
+		<script src="js/services/dateutil.js"></script>
+		<script src="js/services/sso.js"></script>
+		<script src="js/services/util.js"></script>
+		<script src="js/services/xmlutil.js"></script>
+		<script src="js/services/menu.js"></script>
+		<script src="views/ticket/detail/detail.js"></script>
+		<script src="views/ticket/list/list.js"></script>
+		<script src="views/ticket/remainings/remainings.js"></script>
 	</body>
 </html>

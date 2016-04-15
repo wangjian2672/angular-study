@@ -1,24 +1,21 @@
 ﻿'use strict';
 
-var lraBackendApp = angular.module('lraBackend', [
+angular.module('lraBackend', [
 	'ngRoute',
 	'ngMaterial',
-	'lraBackendResource',
 	'lraBackendCtrl'
-]);
-
-lraBackendApp.config(['$routeProvider', '$mdThemingProvider', function($routeProvider, $mdThemingProvider) { 
+]).config(['$routeProvider', '$mdThemingProvider', function($routeProvider, $mdThemingProvider) { 
 	$mdThemingProvider.theme('default')
 		.primaryPalette('grey')
 		.accentPalette('blue-grey');
 
 	$routeProvider.
 		when('/ticket', {
-			templateUrl: 'views/ticket/ticket-list.html',
+			templateUrl: 'views/ticket/list/list.html',
 			controller: 'TicketListCtrl'
 		}).
 		when('/ticket/:ticketId', {
-			templateUrl: 'views/ticket/ticket-detail.html',
+			templateUrl: 'views/ticket/detail/detail.html',
 			controller: 'TicketDetailCtrl'
 		}).
 		otherwise({
