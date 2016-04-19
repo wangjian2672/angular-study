@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('lraBackendDateService', []).service('DateUtil', function(Util){
+angular.module('lraBackend').service('DateUtil', function(){
 	var self = this;
 	this.getUTCDate = function(){
 		let oDate = new Date();
@@ -24,5 +24,11 @@ angular.module('lraBackendDateService', []).service('DateUtil', function(Util){
         sValue += sHours + timeSep + sMinutes + timeSep + sSeconds + "Z";
 
         return sValue;
+	};
+	
+	this.transferCordysDateStringToUTC = function(sValue){
+		var fields = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.exec(sValue);
+        --fields[2]; // month is zero based
+        return new Date(Date.UTC(fields[1], fields[2], fields[3], fields[4], fields[5], fields[6]));
 	};
 });

@@ -1,15 +1,14 @@
 ﻿'use strict';
 
-angular.module('lraBackendMenuService', ['lraBackendUtilService']).service('Menu', ['Util', function(Util){
-	this.constants = {
-		ICON_URL: "img/icons/menu.svg",
-		NAV_ID: "sideMenu"
+angular.module('lraBackend').service('Menu', ['Util', 'SsoUtil', '$mdSidenav', function(Util, SsoUtil, $mdSidenav){
+	this.toggleMenu = function(navId) {
+		$mdSidenav(navId).toggle();
 	};
-	
-	this.methods = {
-		toggleMenu: function(navId) {
-			$mdSidenav(navId).toggle();
-		}
+	this.openMenu = function($mdOpenMenu, $event) {
+		$mdOpenMenu($event);
+	};
+	this.logout = function(){
+		SsoUtil.logout();
 	};
 	
 	this.getAll = function () {

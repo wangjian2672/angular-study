@@ -1,0 +1,15 @@
+﻿<div layout='column' ng-cloak>
+	<md-list flex>
+        <md-subheader>検索結果： {{count}}件</md-subheader>
+        <md-list-item ng-repeat="ticket in tickets" ng-click="showDetail('{{ticket.id}}')">
+			<div class="md-list-item-text" layout="column">
+				<h3>{{ ticket.ticketNo }}</h3>
+				<p>{{"企業コード： " + ticket.companyCode ? ticket.companyCode : ""}}</p>
+				<p>{{"ステータス： " + ticket.status ? ticket.status : ""}}</p>
+				<p>{{"利用者メールアドレス： " + ticket.mailAddress ? ticket.mailAddress : ""}}</p>
+				<p>{{"発行日： " + ticket.issueDate ? ticket.issueDate : ""}}</p>
+				<p>{{"ステータス： " + ticket.status ? ticket.status : ""}}</p>
+			</div>
+        </md-list-item>
+	</md-list>
+</div>

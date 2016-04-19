@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('lraBackendXmlService', []).service('XmlUtil', ['$window', function($window){
+angular.module('lraBackend').service('XmlUtil', ['$window', function($window){
 	var self = this;
 	
 	this.getBrowser = function(){
@@ -208,10 +208,9 @@ angular.module('lraBackendXmlService', []).service('XmlUtil', ['$window', functi
 	
 	this.getTextContent = function(node) {
 		if (typeof(node) == 'object') {
-			textContent = textContent != null ? textContent : "";
-			var property = 'textContent' in node ? "textContent" : (node.uniqueID ? "innerText" : "text");
-			node[property] = textContent;
+			var text = 'textContent' in node ? node.textContent : (node.uniqueID ? node.innerText : node.text); //NOMBV(2)
 		}
+		return text ? text : "";
 	};
 	
 	this.setXMLNamespaces = function(object, namespaces){

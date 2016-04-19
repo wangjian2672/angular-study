@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('lraBackendCookieService', []).service('CookieUtil', function($window){
+angular.module('lraBackend').service('CookieUtil', function($window){
 	var self = this;
 	
 	this.get = function(name){

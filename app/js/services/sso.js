@@ -1,34 +1,24 @@
 ﻿'use strict';
 
-angular.module('lraBackendSsoService', ['lraBackendXmlService']).service('SsoUtil', ['XmlUtil', function(XmlUtil){
+angular.module('lraBackend').service('SsoUtil', [
+	'$location', '$q', '$http', 'lraBackendRouteConst', 'Util', 'XmlUtil', 'CordysConst', 'NamespaceConst', 'HttpMethod', 
+	function($location, $q, $http, lraBackendRouteConst, Util, XmlUtil, CordysConst, NamespaceConst, HttpMethod){
 	var self = this;
-	this.constants = {
-		GATEWAY_URL: "com.eibus.web.soap.Gateway.wcp",
-		PRE_LOGIN_INFO_URL: "com.eibus.sso.web.authentication.PreLoginInfo.wcp",
-		SAMLART_NAME: "SAMLart",
-		CLIENT_ATTRIBUTES_SCHEMA_NAMESPACE: "http://schemas.cordys.com/General/ClientAttributes/",
-		SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
-		I18N_NAMESPACE: "http://www.w3.org/2005/09/ws-i18n",
-		CORDSY_NAMESPACE: "http://schemas.cordys.com/General/1.0/",
-		WSSE_NAMESPACE: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-		WSU_NAMESPACE: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-		SAMLPROTOCOL_NAMESPACE: "urn:oasis:names:tc:SAML:1.0:protocol",
-		SAML_NAMESPACE: "urn:oasis:names:tc:SAML:1.0:assertion",
-		POST: "POST"
-	};
 	
 	this.authenticate = function(userId, password) {
+		var d = $q.defer();
 		if (!userId || !password) {
-            return false;
+			d.resolve(false);
+			return d.promise;
         } else {
-			self.asyncRequestWithMethod('assets/requests/saml_assertion_request.xml', self.constants.POST).then(function(req) {
-				let samlRequest = XmlUtil.parseXml(req);
+			return Util.asyncRequestWithMethod('asserts/requests/saml_assertion_request.xml', HttpMethod.GET).then(function(req) {
+				let samlRequest = XmlUtil.parseXML(req);
 				XmlUtil.setXMLNamespaces(samlRequest, {
-					"SOAP": self.constants.SOAP_NAMESPACE,
-					"wsse": self.constants.WSSE_NAMESPACE,
-					"wsu": self.constants.WSU_NAMESPACE,
-					"samlp": self.constants.SAMLPROTOCOL_NAMESPACE,
-					"saml": self.constants.SAML_NAMESPACE
+					"SOAP": NamespaceConst.SOAP_NAMESPACE,
+					"wsse": NamespaceConst.WSSE_NAMESPACE,
+					"wsu": NamespaceConst.WSU_NAMESPACE,
+					"samlp": NamespaceConst.SAMLPROTOCOL_NAMESPACE,
+					"saml": NamespaceConst.SAML_NAMESPACE
 				});
 
 				let createRequestID = function() {
@@ -55,52 +45,65 @@ angular.module('lraBackendSsoService', ['lraBackendXmlService']).service('SsoUti
 
 				req = XmlUtil.xml2string(samlRequest);
 
-				Util.callCordysWebserviceUseAnonymous(req).then(function(data) {
-					let samlResponse = XmlUtil.parseXml(data);
+				return Util.callCordysWebserviceUseAnonymous(req).then(function(data) {
+					let samlResponse = XmlUtil.parseXML(data);
 					XmlUtil.setXMLNamespaces(samlResponse, {
-						"SOAP": self.constants.SOAP_NAMESPACE,
-						"wsse": self.constants.WSSE_NAMESPACE,
-						"wsu": self.constants.WSU_NAMESPACE,
-						"samlp": self.constants.SAMLPROTOCOL_NAMESPACE,
-						"saml": self.constants.SAML_NAMESPACE
+						"SOAP": NamespaceConst.SOAP_NAMESPACE,
+						"wsse": NamespaceConst.WSSE_NAMESPACE,
+						"wsu": NamespaceConst.WSU_NAMESPACE,
+						"samlp": NamespaceConst.SAMLPROTOCOL_NAMESPACE,
+						"saml": NamespaceConst.SAML_NAMESPACE
 					});
 
-					let assertions = XmlUtil.selectXMLNode(samlResponse, ".//saml:Assertion");
 					let authenticationResult = false;
+					let assertions = XmlUtil.selectXMLNode(samlResponse, ".//saml:Assertion");
 					if (assertions != null) {
 						let samlArtifact = XmlUtil.getNodeText(samlResponse, ".//samlp:AssertionArtifact", null);
 						if (samlArtifact) {
 							let notOnOrAfterString = XmlUtil.getNodeText(samlResponse, ".//saml:Conditions/@NotOnOrAfter", null);
 							if (notOnOrAfterString) {
 								let notOnOrAfterDate = Util.transferCordysDateStringToUTC(notOnOrAfterString);
-								Util.setCookie(Util.constants.SAML_ARTIFACT_COOKIE_NAME, samlArtifact, notOnOrAfterDate, Util.constants.SAML_ARTIFACT_COOKIE_PATH);
+								Util.setCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME, samlArtifact, notOnOrAfterDate, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
 								authenticationResult = true;    
 							}
 						}
 					}
-					resolve(authenticationResult);
+					d.resolve(authenticationResult);
+					return d.promise;
+				}, function(error){
+					d.resolve(false);
+					return d.promise;
 				});
-            });
+			}, function(error){
+				d.resolve(false);
+				return d.promise;
+			});
         }
 	};
 	
 	this.loggedOn = function(){
 		let isLoggedOn = false;
-        let cookie = Util.getCookie(Util.constants.SAML_ARTIFACT_COOKIE_NAME);
+        let cookie = Util.getCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
         isLoggedOn = cookie != null && cookie != "";
         return isLoggedOn;
 	};
 	
-	this.asyncRequestWithMethod = function(url, method){
-		var deferred = $q.defer(); 
-		$http({
-			method: method, 
-			url: url
-		}). success(function(data, status, headers, config) {  
-			deferred.resolve(data); 
-		}). error(function(data, status, headers, config) {  
-			deferred.reject(data); 
-		}); 
-		return deferred.promise;
+	this.logout = function(){
+		Util.removeCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
+		$location.url(lraBackendRouteConst.login);
+	};
+	
+	this.validateLoggedOnBeforeRedirect = function(){
+		var deferred = $q.defer();
+		let isLoggedOn = false;
+        let cookie = Util.getCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
+        isLoggedOn = cookie != null && cookie != "";
+		if (isLoggedOn) {
+			deferred.resolve(); 
+		} else {
+			deferred.reject();
+			$location.url(lraBackendRouteConst.login);
+		}
+        return deferred.promise;
 	};
 }]);
