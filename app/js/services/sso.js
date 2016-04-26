@@ -1,17 +1,16 @@
 ﻿'use strict';
 
 angular.module('lraBackend').service('SsoUtil', [
-	'$location', '$q', '$http', 'lraBackendRouteConst', 'Util', 'XmlUtil', 'CordysConst', 'NamespaceConst', 'HttpMethod', 
-	function($location, $q, $http, lraBackendRouteConst, Util, XmlUtil, CordysConst, NamespaceConst, HttpMethod){
+	'$location', '$q', '$http', 'lraBackendRouteConst', 'WebServiceUtil', 'XmlUtil', 'DateUtil', 'CookieUtil', 'User', 'CordysConst', 'NamespaceConst', 'HttpMethod', 
+	function($location, $q, $http, lraBackendRouteConst, WebServiceUtil, XmlUtil, DateUtil, CookieUtil, User, CordysConst, NamespaceConst, HttpMethod){
 	var self = this;
 	
 	this.authenticate = function(userId, password) {
-		var d = $q.defer();
 		if (!userId || !password) {
-			d.resolve(false);
-			return d.promise;
+			User.reset();
+			return WebServiceUtil._errorCallback();
         } else {
-			return Util.asyncRequestWithMethod('asserts/requests/saml_assertion_request.xml', HttpMethod.GET).then(function(req) {
+			return WebServiceUtil.asyncRequestWithMethod('asserts/requests/saml_assertion_request.xml', HttpMethod.GET).then(function(req) {
 				let samlRequest = XmlUtil.parseXML(req);
 				XmlUtil.setXMLNamespaces(samlRequest, {
 					"SOAP": NamespaceConst.SOAP_NAMESPACE,
@@ -32,7 +31,7 @@ angular.module('lraBackend').service('SsoUtil', [
 
 				// set RequestID, IssueInstant and NameIdentifier
 				XmlUtil.selectXMLNode(samlRequest, "SOAP:Envelope/SOAP:Body/samlp:Request").setAttribute("RequestID", createRequestID());
-				XmlUtil.selectXMLNode(samlRequest, "SOAP:Envelope/SOAP:Body/samlp:Request").setAttribute("IssueInstant", Util.getUTCDate());
+				XmlUtil.selectXMLNode(samlRequest, "SOAP:Envelope/SOAP:Body/samlp:Request").setAttribute("IssueInstant", DateUtil.getUTCDate());
 				XmlUtil.setNodeText(samlRequest, ".//saml:NameIdentifier", userId);
 
 				// Remove security node if no wsse username is used 
@@ -45,7 +44,8 @@ angular.module('lraBackend').service('SsoUtil', [
 
 				req = XmlUtil.xml2string(samlRequest);
 
-				return Util.callCordysWebserviceUseAnonymous(req).then(function(data) {
+				return WebServiceUtil.callCordysWebserviceUseAnonymous(req).then(function(data) {
+					var d = $q.defer();
 					let samlResponse = XmlUtil.parseXML(data);
 					XmlUtil.setXMLNamespaces(samlResponse, {
 						"SOAP": NamespaceConst.SOAP_NAMESPACE,
@@ -62,41 +62,42 @@ angular.module('lraBackend').service('SsoUtil', [
 						if (samlArtifact) {
 							let notOnOrAfterString = XmlUtil.getNodeText(samlResponse, ".//saml:Conditions/@NotOnOrAfter", null);
 							if (notOnOrAfterString) {
-								let notOnOrAfterDate = Util.transferCordysDateStringToUTC(notOnOrAfterString);
-								Util.setCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME, samlArtifact, notOnOrAfterDate, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
+								let notOnOrAfterDate = DateUtil.transferCordysDateStringToUTC(notOnOrAfterString);
+								CookieUtil.set(CordysConst.SAML_ARTIFACT_COOKIE_NAME, samlArtifact, notOnOrAfterDate, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
 								authenticationResult = true;    
 							}
 						}
 					}
+					User.setLoginId(userId);
 					d.resolve(authenticationResult);
 					return d.promise;
 				}, function(error){
-					d.resolve(false);
-					return d.promise;
+					User.reset();
+					return WebServiceUtil._errorCallback();
 				});
 			}, function(error){
-				d.resolve(false);
-				return d.promise;
+				User.reset();
+				return WebServiceUtil._errorCallback();
 			});
         }
 	};
 	
 	this.loggedOn = function(){
 		let isLoggedOn = false;
-        let cookie = Util.getCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
+        let cookie = CookieUtil.get(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
         isLoggedOn = cookie != null && cookie != "";
         return isLoggedOn;
 	};
 	
 	this.logout = function(){
-		Util.removeCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
+		CookieUtil.remove(CordysConst.SAML_ARTIFACT_COOKIE_NAME, CordysConst.SAML_ARTIFACT_COOKIE_PATH);
 		$location.url(lraBackendRouteConst.login);
 	};
 	
 	this.validateLoggedOnBeforeRedirect = function(){
 		var deferred = $q.defer();
 		let isLoggedOn = false;
-        let cookie = Util.getCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
+        let cookie = CookieUtil.get(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
         isLoggedOn = cookie != null && cookie != "";
 		if (isLoggedOn) {
 			deferred.resolve(); 

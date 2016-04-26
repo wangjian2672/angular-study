@@ -1,0 +1,33 @@
+﻿<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <GetManagementLedgerInfoList xmlns="http://schemas.intasect.co.jp/lrabackend/service/managementledger" preserveSpace="no" qAccess="0" qValues="">
+      <cursor id="0" position="0" numRows="20" maxRows="99999" sameConnection="false" />
+      <managementLedgerInfo>
+        <ManagementLedgerInput>
+          <applicationId />
+          <mailAddress />
+          <bn />
+          <pinCode />
+          <employeeNo />
+          <employeeName />
+          <issueDateFrom />
+          <revokeDateFrom />
+          <status />
+          <validateDate />
+          <certificationId />
+          <applyType />
+          <applyDate />
+          <companyCode />
+          <ticketNo />
+          <divisionCode />
+          <companyName />
+          <loginId />
+          <isCertificationSent />
+          <orderId />
+          <issueDateTo />
+          <revokeDateTo />
+        </ManagementLedgerInput>
+      </managementLedgerInfo>
+    </GetManagementLedgerInfoList>
+  </SOAP:Body>
+</SOAP:Envelope>

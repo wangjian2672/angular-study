@@ -14,15 +14,12 @@ angular.module('lraBackend').constant('MenuConst', {
 				$scope.loginForm.loginErrors = {
 					authenticateError: true
 				};
-				
 			}
 		});
 	}
-}]).controller('mainCtrl', ['$scope', '$http', 'Menu', 'MenuConst', function($scope, $http, Menu, MenuConst){
+}]).controller('mainCtrl', ['$scope', '$http', 'Menu', 'User', 'MenuConst', function($scope, $http, Menu, User, MenuConst){
+	// メニュー
 	$scope.menus = Menu.getAll();
-	
-	$scope.userName = "王　健成";
-
 	$scope.menuBase = {
 		navSvg: MenuConst.NAVI_ICON_URL,
 		userSvg: MenuConst.USER_ICON_URL,
@@ -32,4 +29,9 @@ angular.module('lraBackend').constant('MenuConst', {
 	$scope.toggleMenu = Menu.toggleMenu;
 	$scope.openMenu = Menu.openMenu;
 	$scope.logout = Menu.logout;
+	
+	// ユーザ
+	User.getUserDetail().then(function(data){
+		$scope.userName = data.userName;
+	});
 }]);

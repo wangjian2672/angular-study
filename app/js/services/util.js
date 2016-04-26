@@ -1,11 +1,9 @@
 ﻿'use strict';
 
 angular.module('lraBackend').service('Util',  [
-	'$http', '$q', 'CookieUtil', 'XmlUtil', 'DateUtil', 'HttpMethod', 'CordysConst', 
-	function($http, $q, CookieUtil, XmlUtil, DateUtil, HttpMethod, CordysConst){
+	'$http', '$q', 'CookieUtil', 'XmlUtil', 'DateUtil', 'SsoUtil', 'WebServiceUtil', 'HttpMethod', 'CordysConst', 
+	function($http, $q, CookieUtil, XmlUtil, DateUtil, SsoUtil, WebServiceUtil, HttpMethod, CordysConst){
 		var self = this;
-		
-		this.userLang = navigator.language;
 		
 		this.getBrowser = function(){
 			return XmlUtil.getBrowser();
@@ -57,54 +55,6 @@ angular.module('lraBackend').service('Util',  [
 
 		this.setXMLAttribute = function(elementNode, attributeNamespace, attributeName, attributeValue) {
 			return XmlUtil.setXMLAttribute(elementNode, attributeNamespace, attributeName, attributeValue);
-		};
-		
-		this.callCordysWebserviceUseAnonymous = function(request){
-			let useAnonymous = true;
-			return self.callCordysWebservice(request, useAnonymous);
-		};
-		
-		this.callCordysWebservice = function(request, useAnonymous){
-			if (!useAnonymous) {
-				// If there is not a saml artifact in cookie, then redirect to Login page.
-				let sso = SsoUtil.init();
-				if (!sso.loggedOn()) {
-					// redirect to Login page.
-					SsoUtil.logout();
-					return;
-				}
-			}
-			
-			let url = CordysConst.BASE_URL + CordysConst.GATEWAY_URL;
-			if (!useAnonymous) {
-				url = url + "?" + CordysConst.SAMLART_NAME + "=" +
-				self.getCookie(CordysConst.SAML_ARTIFACT_COOKIE_NAME);
-			} 
-			
-			url = url + "?language=" + self.userLang;	
-			
-			return self.asyncRequestWithMethod(url, HttpMethod.POST, request);
-		};
-		
-		this.callCordysWebserviceWithUrl = function(url){
-			return self.asyncRequestWithMethod(url, HttpMethod.POST);
-		};
-		
-		this.asyncRequestWithMethod = function(url, method, request){
-			var deferred = $q.defer(); 
-			$http({
-				method: method, 
-				url: url,
-				headers: {
-				   'Content-Type': undefined
-				},
-				data: request
-			}). success(function(data, status, headers, config) {  
-				deferred.resolve(data); 
-			}). error(function(data, status, headers, config) {  
-				deferred.reject(data); 
-			}); 
-			return deferred.promise;
 		};
 		
 		this.setCookie = function(name, value, end, path, domain, secure){

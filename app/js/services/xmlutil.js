@@ -151,6 +151,13 @@ angular.module('lraBackend').service('XmlUtil', ['$window', function($window){
         return result;
 	};
 	
+	this.normalize = function(value, options) {
+        if (!!options.normalize) {
+            return (value || '').trim();
+        }
+        return value;
+    };
+	
 	this.xml2string = function(xml){
 		return new XMLSerializer().serializeToString(xml);
 	};

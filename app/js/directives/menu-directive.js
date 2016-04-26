@@ -26,19 +26,25 @@ angular.module('lraBackend').directive('lraMenu', function(){
 							"</md-menu>" + 
 						"</div>" + 
 					"</md-toolbar>" + 
-					"<div flex layout='row' md-whiteframe='4'>" + 
-						"<md-sidenav class='md-sidenav-left' md-component-id='{{menuBase.navMenu}}' md-is-locked-open='$mdMedia(\"gt-md\")' md-disable-backdrop flex='30'>" + 
-							"<md-content layout-padding>" + 
-								"<md-list ng-cloak>" + 
-									"<md-list-item ng-repeat='menu in menus'>" + 
-										"<md-button>" + 
-											"{{menu.name}}" + 
-										"</md-button>" + 
-									"</md-list-item>" + 
-								"</md-list>" + 
-							"</md-content>" + 
-						"</md-sidenav>" + 
-					"</div>" + 
+					"<lra-bottom></lra-bottom>" +  
 				"</div>"
+	}
+}).directive('lraBottom', function(){
+	return {
+		restrict: 'E',
+		template: "<md-bottom-sheet class='md-grid' layout='column' ng-cloak>" + 
+						"<div>" + 
+							"<md-list flex layout='row' layout-align='center cenger'>" + 
+								"<md-list-item ng-repeat='menu in menus'>" + 
+									"<div>" + 
+										"<md-button class='md-grid-item-content' ng-click='listItemClick(menu.id)'>" + 
+											"<md-icon md-svg-src='{{menu.icon}}'></md-icon>" + 
+											"<div class='md-grid-text'> {{ menu.name }} </div>" + 
+										"</md-button>" + 
+									"</div>" + 
+								"</md-list-item>" + 
+							"</md-list>" + 
+						"</div>" + 
+					"</md-bottom-sheet>"
 	}
 });

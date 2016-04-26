@@ -1,11 +1,17 @@
 ﻿'use strict';
 
 angular.module('lraBackend')
-.controller('TicketListCtrl', ['$scope', 'Ticket', function($scope){
-	$scope.tickets = Ticket.search();
+.controller('TicketListCtrl', ['$scope', 'Ticket', function($scope, Ticket){
+	Ticket.search().then(function(obj){
+		$scope.tickets = obj.tickets;
+		$scope.count = obj.count;
+	});
 }])
 .controller('TicketSearchCtrl', ['$scope', 'Ticket', function($scope, Ticket){
 	$scope.statusList = [{
+		code: "",
+		name: ""
+	},{
 		code: "BACKEND_TICKET_VALIDATE",
 		name: "有効"
 	}, {
@@ -23,5 +29,7 @@ angular.module('lraBackend')
 		statusCode: $scope.statusList[0].code
 	}
 	
-	$scope.searchTicket = Ticket.methods.searchTicket;
+	$scope.searchTicket = function(){
+		Ticket.searchTicket($scope.ticket);
+	};
 }]);

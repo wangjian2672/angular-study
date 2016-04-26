@@ -1,15 +1,21 @@
-﻿<div layout='column' ng-cloak>
+﻿<lra-menu></lra-menu>
+<div layout='column' ng-cloak>
 	<md-list flex>
-        <md-subheader>検索結果： {{count}}件</md-subheader>
-        <md-list-item ng-repeat="ticket in tickets" ng-click="showDetail('{{ticket.id}}')">
-			<div class="md-list-item-text" layout="column">
-				<h3>{{ ticket.ticketNo }}</h3>
-				<p>{{"企業コード： " + ticket.companyCode ? ticket.companyCode : ""}}</p>
-				<p>{{"ステータス： " + ticket.status ? ticket.status : ""}}</p>
-				<p>{{"利用者メールアドレス： " + ticket.mailAddress ? ticket.mailAddress : ""}}</p>
-				<p>{{"発行日： " + ticket.issueDate ? ticket.issueDate : ""}}</p>
-				<p>{{"ステータス： " + ticket.status ? ticket.status : ""}}</p>
-			</div>
-        </md-list-item>
+        <md-subheader>{{"検索結果：" + count + "件"}}</md-subheader>
+		<md-card ng-repeat="ticket in tickets" layout="column">
+			<md-card-title>
+				<span class="md-headline">{{ ticket.ticketNo }}</span>
+			</md-card-title>
+			<md-card-content>
+				<p ng-hide="{{ticket.companyCode}}">{{ "企業コード： " + ticket.companyCode }}</p>
+				<p ng-hide="{{ticket.employeeName}}">{{ "ステータス： " + ticket.employeeName }}</p>
+				<p ng-hide="{{ticket.mailAddress}}">{{ "利用者メールアドレス： " + ticket.mailAddress }}</p>
+				<p ng-hide="{{ticket.issueDate}}">{{ "発行日： " + ticket.issueDate }}</p>
+				<p ng-hide="{{ticket.statusName}}">{{ "ステータス： " + ticket.statusName }}</p>
+			</md-card-content>
+			<md-card-actions layout="row" layout-align="start center">
+				<md-button class="md-primary" ng-click="showDetail(ticket.ticketNo)">詳細</md-button>
+			</md-card-actions>
+		</md-card>
 	</md-list>
 </div>
